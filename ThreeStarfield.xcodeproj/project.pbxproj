@@ -6,7 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		F20952EF2E9810C000F95E2A /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = F20952EE2E9810C000F95E2A /* README.md */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
+		F20952EE2E9810C000F95E2A /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		F296F8172E97FF7100184B1D /* ThreeStarfield.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ThreeStarfield.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -34,6 +39,7 @@
 			children = (
 				F296F8192E97FF7100184B1D /* ThreeStarfield */,
 				F296F8182E97FF7100184B1D /* Products */,
+				F20952EE2E9810C000F95E2A /* README.md */,
 			);
 			sourceTree = "<group>";
 		};
@@ -109,6 +115,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F20952EF2E9810C000F95E2A /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

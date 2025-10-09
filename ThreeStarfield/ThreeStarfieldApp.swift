@@ -11,7 +11,7 @@ import SwiftUI
 struct ThreeStarfieldApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            StarfieldView()
         }
     }
 }

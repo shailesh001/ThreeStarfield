@@ -1,0 +1,254 @@
+{
+  "stars": [
+    {
+      "name": "Sirius",
+      "type": "A1V",
+      "magnitude": -1.46,
+      "distance": 8.6,
+      "temperature": 9940,
+      "rightAscension": 101.287,
+      "declination": -16.716,
+      "color": "#9db4ff"
+    },
+    {
+      "name": "Canopus",
+      "type": "A9II",
+      "magnitude": -0.72,
+      "distance": 310,
+      "temperature": 7350,
+      "rightAscension": 95.988,
+      "declination": -52.696,
+      "color": "#cad8ff"
+    },
+    {
+      "name": "Arcturus",
+      "type": "K1.5III",
+      "magnitude": -0.04,
+      "distance": 36.7,
+      "temperature": 4290,
+      "rightAscension": 213.915,
+      "declination": 19.182,
+      "color": "#ffb347"
+    },
+    {
+      "name": "Alpha Centauri A",
+      "type": "G2V",
+      "magnitude": -0.01,
+      "distance": 4.37,
+      "temperature": 5790,
+      "rightAscension": 219.902,
+      "declination": -60.834,
+      "color": "#fff4e8"
+    },
+    {
+      "name": "Vega",
+      "type": "A0V",
+      "magnitude": 0.03,
+      "distance": 25,
+      "temperature": 9602,
+      "rightAscension": 279.234,
+      "declination": 38.783,
+      "color": "#9db4ff"
+    },
+    {
+      "name": "Capella",
+      "type": "G5III",
+      "magnitude": 0.08,
+      "distance": 42.2,
+      "temperature": 4970,
+      "rightAscension": 79.172,
+      "declination": 45.998,
+      "color": "#fff9e3"
+    },
+    {
+      "name": "Rigel",
+      "type": "B8Ia",
+      "magnitude": 0.12,
+      "distance": 860,
+      "temperature": 11000,
+      "rightAscension": 78.634,
+      "declination": -8.202,
+      "color": "#bbccff"
+    },
+    {
+      "name": "Procyon",
+      "type": "F5IV-V",
+      "magnitude": 0.38,
+      "distance": 11.4,
+      "temperature": 6530,
+      "rightAscension": 114.826,
+      "declination": 5.225,
+      "color": "#f8f7ff"
+    },
+    {
+      "name": "Betelgeuse",
+      "type": "M1-2Ia-ab",
+      "magnitude": 0.5,
+      "distance": 548,
+      "temperature": 3500,
+      "rightAscension": 88.793,
+      "declination": 7.407,
+      "color": "#ff6347"
+    },
+    {
+      "name": "Achernar",
+      "type": "B3Vpe",
+      "magnitude": 0.46,
+      "distance": 139,
+      "temperature": 15000,
+      "rightAscension": 24.429,
+      "declination": -57.237,
+      "color": "#aabfff"
+    },
+    {
+      "name": "Altair",
+      "type": "A7V",
+      "magnitude": 0.77,
+      "distance": 16.7,
+      "temperature": 7550,
+      "rightAscension": 297.696,
+      "declination": 8.868,
+      "color": "#cad8ff"
+    },
+    {
+      "name": "Aldebaran",
+      "type": "K5III",
+      "magnitude": 0.85,
+      "distance": 65,
+      "temperature": 3910,
+      "rightAscension": 68.980,
+      "declination": 16.509,
+      "color": "#ff9966"
+    },
+    {
+      "name": "Spica",
+      "type": "B1III-IV",
+      "magnitude": 0.98,
+      "distance": 250,
+      "temperature": 22400,
+      "rightAscension": 201.298,
+      "declination": -11.161,
+      "color": "#aabfff"
+    },
+    {
+      "name": "Antares",
+      "type": "M1.5Iab-b",
+      "magnitude": 1.06,
+      "distance": 550,
+      "temperature": 3570,
+      "rightAscension": 247.352,
+      "declination": -26.432,
+      "color": "#ff4500"
+    },
+    {
+      "name": "Pollux",
+      "type": "K0IIIb",
+      "magnitude": 1.14,
+      "distance": 33.7,
+      "temperature": 4666,
+      "rightAscension": 116.329,
+      "declination": 28.026,
+      "color": "#ffb347"
+    },
+    {
+      "name": "Fomalhaut",
+      "type": "A3V",
+      "magnitude": 1.16,
+      "distance": 25.1,
+      "temperature": 8590,
+      "rightAscension": 344.413,
+      "declination": -29.622,
+      "color": "#cad8ff"
+    },
+    {
+      "name": "Deneb",
+      "type": "A2Ia",
+      "magnitude": 1.25,
+      "distance": 2615,
+      "temperature": 8525,
+      "rightAscension": 310.358,
+      "declination": 45.280,
+      "color": "#cad8ff"
+    },
+    {
+      "name": "Regulus",
+      "type": "B7V",
+      "magnitude": 1.35,
+      "distance": 79.3,
+      "temperature": 12460,
+      "rightAscension": 152.093,
+      "declination": 11.967,
+      "color": "#bbccff"
+    },
+    {
+      "name": "Adhara",
+      "type": "B2II",
+      "magnitude": 1.50,
+      "distance": 430,
+      "temperature": 22200,
+      "rightAscension": 104.656,
+      "declination": -28.972,
+      "color": "#aabfff"
+    },
+    {
+      "name": "Castor",
+      "type": "A1V",
+      "magnitude": 1.58,
+      "distance": 51.5,
+      "temperature": 10300,
+      "rightAscension": 113.650,
+      "declination": 31.888,
+      "color": "#9db4ff"
+    },
+    {
+      "name": "Bellatrix",
+      "type": "B2III",
+      "magnitude": 1.64,
+      "distance": 250,
+      "temperature": 21800,
+      "rightAscension": 81.283,
+      "declination": 6.350,
+      "color": "#aabfff"
+    },
+    {
+      "name": "Alnilam",
+      "type": "B0Ia",
+      "magnitude": 1.69,
+      "distance": 2000,
+      "temperature": 27000,
+      "rightAscension": 84.053,
+      "declination": -1.202,
+      "color": "#aabfff"
+    },
+    {
+      "name": "Polaris",
+      "type": "F7Ib",
+      "magnitude": 1.98,
+      "distance": 433,
+      "temperature": 6015,
+      "rightAscension": 37.955,
+      "declination": 89.264,
+      "color": "#f8f7ff"
+    },
+    {
+      "name": "Dubhe",
+      "type": "K0III",
+      "magnitude": 1.79,
+      "distance": 123,
+      "temperature": 4660,
+      "rightAscension": 165.932,
+      "declination": 61.751,
+      "color": "#ffb347"
+    },
+    {
+      "name": "Mirfak",
+      "type": "F5Ib",
+      "magnitude": 1.79,
+      "distance": 590,
+      "temperature": 6350,
+      "rightAscension": 51.080,
+      "declination": 49.861,
+      "color": "#f8f7ff"
+    }
+  ]
+}

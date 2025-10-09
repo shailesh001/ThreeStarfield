@@ -1,0 +1,44 @@
+# Xcode workspace UI state
+*.xcuserstate
+*.xcscmblueprint
+
+# User-specific data
+*.xcuserdata/
+*.xcuserdatad/
+
+# Build artifacts
+build/
+DerivedData/
+
+# Swift Package Manager
+.swiftpm/
+Package.resolved
+Packages/
+
+# CocoaPods
+Pods/
+Podfile.lock
+
+# Carthage
+Carthage/
+Carthage/Build/
+
+# Fastlane
+fastlane/report.xml
+fastlane/screenshots
+fastlane/test_output
+
+# Archives
+*.xcarchive
+
+# Debugging
+*.moved-aside
+*.swp
+*.orig
+
+# IDE backups
+*.xcplayground
+*.xcplaygroundpage
+
+# DS_Store and system files
+.DS_Store

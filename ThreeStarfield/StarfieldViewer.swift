@@ -150,6 +150,13 @@ extension Color {
     }
 }
 
+// MARK: - Notification extension for settings update
+
+extension Notification.Name {
+    static let starfieldSettingsUpdated = Notification.Name("starfieldSettingsUpdated")
+    static let starfieldSelectedStarScreenPoint = Notification.Name("starfieldSelectedStarScreenPoint")
+}
+
 // MARK: - Star Node
 
 /// Custom SCNNode subclass that stores associated star metadata.
@@ -254,6 +261,7 @@ class StarfieldSceneManager {
     let scene = SCNScene()
     private(set) var cameraNode: SCNNode!
     private(set) var starNodes: [SCNNode] = []
+    private var backgroundNode: SCNNode?
     
     init() {
         setupScene()
@@ -315,9 +323,36 @@ class StarfieldSceneManager {
             starNodes.append(node)
         }
         
-        // Add background starfield
-        let backgroundNode = BackgroundStarFactory.createBackgroundStars()
-        scene.rootNode.addChildNode(backgroundNode)
+        // Add background starfield (managed via settings)
+        if backgroundNode == nil {
+            backgroundNode = BackgroundStarFactory.createBackgroundStars()
+            if let backgroundNode {
+                scene.rootNode.addChildNode(backgroundNode)
+            }
+        }
+    }
+    
+    func apply(settings: StarfieldViewModel.Settings) {
+        // Background stars visibility
+        backgroundNode?.isHidden = !settings.showBackgroundStars
+        // Fog density
+        scene.fogDensityExponent = settings.fogDensityExponent
+        // Camera controls are applied on SCNView; stored for later via notification
+        NotificationCenter.default.post(name: .starfieldSettingsUpdated, object: nil, userInfo: [
+            "cameraAllowsControl": settings.cameraAllowsControl,
+            "starSizeScale": settings.starSizeScale
+        ])
+        // Scale all star nodes
+        for node in starNodes {
+            if let starNode = node as? StarNode {
+                let scale = Float(settings.starSizeScale)
+                starNode.scale = SCNVector3(x: scale, y: scale, z: scale)
+                // Also scale the glow child, if present (first child is glow sphere)
+                if let glow = starNode.childNodes.first {
+                    glow.scale = SCNVector3(x: scale, y: scale, z: scale)
+                }
+            }
+        }
     }
 }
 
@@ -328,23 +363,65 @@ class StarfieldSceneManager {
 @available(iOS 15.0, *)
 struct StarfieldView: View {
     @StateObject private var viewModel = StarfieldViewModel()
+    @State private var showSettings = false
     
     var body: some View {
         ZStack {
             // SceneKit view
             SceneKitViewRepresentable(sceneManager: viewModel.sceneManager,
-                                      selectedStar: $viewModel.selectedStar)
+                                      selectedStar: $viewModel.selectedStar,
+                                      settings: $viewModel.settings)
                 .edgesIgnoringSafeArea(.all)
             
             // Star info overlay
-            if let star = viewModel.selectedStar {
-                VStack {
-                    StarInfoPanel(star: star, onClose: {
+            if let star = viewModel.selectedStar, let pos = viewModel.infoPanelPosition {
+                GeometryReader { proxy in
+                    let size = proxy.size
+                    let padding: CGFloat = 12
+                    let panelWidth: CGFloat = 300
+                    let panelHeight: CGFloat = 200
+                    let offsetX: CGFloat = 16
+
+                    let desiredX = pos.x + offsetX + panelWidth / 2
+                    let desiredY = pos.y
+
+                    let clampedX = min(max(desiredX, padding + panelWidth / 2), size.width - padding - panelWidth / 2)
+                    let clampedY = min(max(desiredY, padding + panelHeight / 2), size.height - padding - panelHeight / 2)
+
+                    StarInfoPanel(star: star, opacity: viewModel.settings.infoPanelOpacity, onClose: {
                         viewModel.selectedStar = nil
+                        viewModel.infoPanelPosition = nil
                     })
-                    .padding()
-                    Spacer()
+                    .fixedSize()
+                    .position(x: clampedX, y: clampedY)
+                    .transition(.opacity)
+                    .zIndex(3)
                 }
+            }
+            
+            // Settings button
+            VStack {
+                HStack {
+                    Spacer()
+                    Button(action: { showSettings.toggle() }) {
+                        Image(systemName: "slider.horizontal.3")
+                            .foregroundColor(.white)
+                            .padding(10)
+                            .background(Color.black.opacity(0.6))
+                            .clipShape(Capsule())
+                    }
+                    .padding([.top, .trailing])
+                }
+                Spacer()
+            }
+            
+            if showSettings {
+                SettingsPanel(
+                    isPresented: $showSettings,
+                    settings: $viewModel.settings
+                )
+                .transition(.move(edge: .trailing))
+                .zIndex(2)
             }
             
             // Loading indicator
@@ -370,6 +447,13 @@ struct StarfieldView: View {
         }
         .onAppear {
             viewModel.loadStars()
+            viewModel.applySettings()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .starfieldSelectedStarScreenPoint)) { note in
+            if let point = note.userInfo?["point"] as? CGPoint {
+                // SCNView's coordinate system origin is top-left for UIKit, but projectPoint returns in view space; convert if needed
+                viewModel.infoPanelPosition = point
+            }
         }
     }
 }
@@ -381,6 +465,17 @@ class StarfieldViewModel: ObservableObject {
     @Published var selectedStar: Star?
     @Published var isLoading = false
     @Published var errorMessage: String?
+    @Published var infoPanelPosition: CGPoint? = nil
+    
+    struct Settings: Equatable {
+        var showBackgroundStars: Bool = true
+        var fogDensityExponent: CGFloat = 0.00025
+        var cameraAllowsControl: Bool = true
+        var starSizeScale: CGFloat = 1.0
+        var infoPanelOpacity: CGFloat = 0.85
+    }
+
+    @Published var settings = Settings()
     
     let sceneManager = StarfieldSceneManager()
     
@@ -395,6 +490,7 @@ class StarfieldViewModel: ObservableObject {
                     sceneManager.loadStars(stars)
                     isLoading = false
                     print("Loaded \(stars.count) stars")
+                    applySettings()
                 }
             } catch {
                 await MainActor.run {
@@ -404,6 +500,10 @@ class StarfieldViewModel: ObservableObject {
             }
         }
     }
+    
+    func applySettings() {
+        sceneManager.apply(settings: settings)
+    }
 }
 
 // MARK: - SwiftUI SceneKit Representable
@@ -412,11 +512,12 @@ class StarfieldViewModel: ObservableObject {
 struct SceneKitViewRepresentable: UIViewRepresentable {
     let sceneManager: StarfieldSceneManager
     @Binding var selectedStar: Star?
+    @Binding var settings: StarfieldViewModel.Settings
     
     func makeUIView(context: Context) -> SCNView {
         let sceneView = SCNView()
         sceneView.scene = sceneManager.scene
-        sceneView.allowsCameraControl = true
+        sceneView.allowsCameraControl = settings.cameraAllowsControl
         #if canImport(UIKit)
         sceneView.backgroundColor = .black
         #elseif canImport(AppKit)
@@ -437,11 +538,17 @@ struct SceneKitViewRepresentable: UIViewRepresentable {
         
         context.coordinator.sceneView = sceneView
         
+        NotificationCenter.default.addObserver(forName: .starfieldSettingsUpdated, object: nil, queue: .main) { note in
+            if let allows = note.userInfo?["cameraAllowsControl"] as? Bool {
+                sceneView.allowsCameraControl = allows
+            }
+        }
+        
         return sceneView
     }
     
     func updateUIView(_ uiView: SCNView, context: Context) {
-        // Update if needed
+        sceneManager.apply(settings: settings)
     }
     
     func makeCoordinator() -> Coordinator {
@@ -487,6 +594,16 @@ struct SceneKitViewRepresentable: UIViewRepresentable {
                 }()
                 
                 if let starNode = targetNode {
+                    let projected = sceneView.projectPoint(starNode.worldPosition)
+                    let projectedPointInView = CGPoint(
+                        x: CGFloat(projected.x),
+                        y: sceneView.bounds.height - CGFloat(projected.y)
+                    )
+                    NotificationCenter.default.post(
+                        name: .starfieldSelectedStarScreenPoint,
+                        object: nil,
+                        userInfo: ["point": projectedPointInView]
+                    )
                     selectedStar = starNode.star
                     highlightNode(starNode)
                     return
@@ -508,6 +625,7 @@ struct SceneKitViewRepresentable: UIViewRepresentable {
 @available(iOS 15.0, *)
 struct StarInfoPanel: View {
     let star: Star
+    let opacity: CGFloat
     let onClose: () -> Void
     
     var body: some View {
@@ -531,7 +649,7 @@ struct StarInfoPanel: View {
             InfoRow(label: "Temperature", value: "\(star.temperature.formatted()) K")
         }
         .padding()
-        .background(Color.black.opacity(0.85))
+        .background(Color.black.opacity(opacity))
         .cornerRadius(12)
         .shadow(radius: 10)
     }
@@ -553,51 +671,58 @@ struct InfoRow: View {
     }
 }
 
-// MARK: - Usage Instructions
+// MARK: - Settings Panel
 
-/*
- 
- HOW TO USE THIS FILE IN YOUR iOS PROJECT:
- 
- 1. Add this file to your Xcode project (drag & drop into Project Navigator).
- 
- 2. Add your `data.json` file to your app bundle:
-    - Drag `data.json` into Xcode
-    - Ensure "Copy items if needed" is checked
-    - Make sure it's added to your app target
- 
- 3. SWIFTUI USAGE:
-    In your SwiftUI app, use the StarfieldView:
-    
-    ```swift
-    import SwiftUI
- 
-    @main
-    struct MyApp: App {
-        var body: some Scene {
-            WindowGroup {
-                StarfieldView()
+@available(iOS 15.0, *)
+struct SettingsPanel: View {
+    @Binding var isPresented: Bool
+    @Binding var settings: StarfieldViewModel.Settings
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Text("Settings").font(.headline).foregroundColor(.white)
+                Spacer()
+                Button(action: { isPresented = false }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(.white.opacity(0.8))
+                }
+            }
+
+            Toggle(isOn: $settings.showBackgroundStars) {
+                Text("Show Background Stars").foregroundColor(.white)
+            }
+
+            Toggle(isOn: $settings.cameraAllowsControl) {
+                Text("Allow Camera Control").foregroundColor(.white)
+            }
+
+            VStack(alignment: .leading) {
+                Text("Fog Density").foregroundColor(.white)
+                Slider(value: Binding(get: {
+                    Double(settings.fogDensityExponent)
+                }, set: { newVal in
+                    settings.fogDensityExponent = CGFloat(newVal)
+                }), in: 0...0.002)
+            }
+
+            VStack(alignment: .leading) {
+                Text("Star Size Scale").foregroundColor(.white)
+                Slider(value: $settings.starSizeScale, in: 0.5...2.0)
+            }
+            
+            VStack(alignment: .leading) {
+                Text("Info Panel Opacity").foregroundColor(.white)
+                Slider(value: $settings.infoPanelOpacity, in: 0.3...1.0)
             }
         }
+        .padding()
+        .background(Color.black.opacity(0.9))
+        .cornerRadius(12)
+        .shadow(radius: 10)
+        .frame(maxWidth: 320)
+        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
     }
-    ```
- 
- 4. CUSTOMIZATION:
-    - Adjust `CoordinateConverter.distanceScale` to change star spread
-    - Modify `StarSizer.size(for:)` to change star sizes
-    - Tweak particle system in `BackgroundStarFactory` for background density
-    - Adjust camera position in `StarfieldSceneManager.setupCamera()`
- 
- 6. PERFORMANCE TIPS:
-    - For large catalogs (>10k stars), consider using instanced geometry or Metal
-    - Reduce `segmentCount` in sphere creation for better performance
-    - Use particle systems for very distant/small stars
-    - Implement LOD (level of detail) based on distance from camera
- 
- 5. TROUBLESHOOTING:
-    - If stars don't appear, check that data.json is in the bundle
-    - Check Xcode console for error messages
-    - Verify JSON structure matches the `Star` and `StarCatalog` models
-    - Test on device for best performance (simulator may be slow)
- 
- */
+}
+

@@ -559,6 +559,7 @@ struct SceneKitViewRepresentable: UIViewRepresentable {
         @Binding var selectedStar: Star?
         weak var sceneView: SCNView?
         var lastAppliedSettings: StarfieldViewModel.Settings?
+        private var settingsObserver: NSObjectProtocol?
         
         init(sceneManager: StarfieldSceneManager, selectedStar: Binding<Star?>) {
             self.sceneManager = sceneManager

@@ -543,7 +543,11 @@ struct SceneKitViewRepresentable: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: SCNView, context: Context) {
-        sceneManager.apply(settings: settings)
+        // Only apply settings if they have changed
+        if context.coordinator.lastAppliedSettings != settings {
+            sceneManager.apply(settings: settings)
+            context.coordinator.lastAppliedSettings = settings
+        }
     }
     
     func makeCoordinator() -> Coordinator {
@@ -554,7 +558,7 @@ struct SceneKitViewRepresentable: UIViewRepresentable {
         let sceneManager: StarfieldSceneManager
         @Binding var selectedStar: Star?
         weak var sceneView: SCNView?
-        private var settingsObserver: NSObjectProtocol?
+        var lastAppliedSettings: StarfieldViewModel.Settings?
         
         init(sceneManager: StarfieldSceneManager, selectedStar: Binding<Star?>) {
             self.sceneManager = sceneManager

@@ -537,12 +537,7 @@ struct SceneKitViewRepresentable: UIViewRepresentable {
         #endif
         
         context.coordinator.sceneView = sceneView
-        
-        NotificationCenter.default.addObserver(forName: .starfieldSettingsUpdated, object: nil, queue: .main) { note in
-            if let allows = note.userInfo?["cameraAllowsControl"] as? Bool {
-                sceneView.allowsCameraControl = allows
-            }
-        }
+        context.coordinator.setupObservers(for: sceneView)
         
         return sceneView
     }
@@ -568,6 +563,30 @@ struct SceneKitViewRepresentable: UIViewRepresentable {
         init(sceneManager: StarfieldSceneManager, selectedStar: Binding<Star?>) {
             self.sceneManager = sceneManager
             self._selectedStar = selectedStar
+        }
+        
+        deinit {
+            if let observer = settingsObserver {
+                NotificationCenter.default.removeObserver(observer)
+            }
+        }
+        
+        func setupObservers(for sceneView: SCNView) {
+            // Remove any existing observer first
+            if let observer = settingsObserver {
+                NotificationCenter.default.removeObserver(observer)
+            }
+            
+            // Add observer and store the token for cleanup
+            settingsObserver = NotificationCenter.default.addObserver(
+                forName: .starfieldSettingsUpdated,
+                object: nil,
+                queue: .main
+            ) { [weak sceneView] note in
+                if let allows = note.userInfo?["cameraAllowsControl"] as? Bool {
+                    sceneView?.allowsCameraControl = allows
+                }
+            }
         }
         
         @objc func handleTap(_ gesture: Any) {

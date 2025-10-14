@@ -699,11 +699,13 @@ struct SettingsPanel: View {
 
             VStack(alignment: .leading) {
                 Text("Fog Density").foregroundColor(.white)
-                Slider(value: Binding(get: {
-                    Double(settings.fogDensityExponent)
-                }, set: { newVal in
-                    settings.fogDensityExponent = CGFloat(newVal)
-                }), in: 0...0.002)
+                Slider(
+                    value: Binding(
+                        get: { Double(settings.fogDensityExponent) },
+                        set: { settings.fogDensityExponent = CGFloat($0) }
+                    ),
+                    in: 0...0.002
+                )
             }
 
             VStack(alignment: .leading) {

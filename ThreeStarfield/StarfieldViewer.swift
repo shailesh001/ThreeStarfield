@@ -332,11 +332,17 @@ class StarfieldSceneManager {
         }
     }
     
-    func apply(settings: StarfieldViewModel.Settings) {
+    func apply(settings: StarfieldViewModel.Settings, updateCameraPosition: Bool = true) {
         // Background stars visibility
         backgroundNode?.isHidden = !settings.showBackgroundStars
         // Fog density
         scene.fogDensityExponent = settings.fogDensityExponent
+        
+        // Camera zoom (Z position) - only update if requested
+        if updateCameraPosition {
+            cameraNode.position.z = Float(settings.zoomLevel)
+        }
+        
         // Camera controls are applied on SCNView; stored for later via notification
         NotificationCenter.default.post(name: .starfieldSettingsUpdated, object: nil, userInfo: [
             "cameraAllowsControl": settings.cameraAllowsControl,
@@ -418,7 +424,10 @@ struct StarfieldView: View {
             if showSettings {
                 SettingsPanel(
                     isPresented: $showSettings,
-                    settings: $viewModel.settings
+                    settings: $viewModel.settings,
+                    onReset: {
+                        viewModel.resetView()
+                    }
                 )
                 .transition(.move(edge: .trailing))
                 .zIndex(2)
@@ -449,6 +458,7 @@ struct StarfieldView: View {
             viewModel.loadStars()
             viewModel.applySettings()
         }
+
         .onReceive(NotificationCenter.default.publisher(for: .starfieldSelectedStarScreenPoint)) { note in
             if let point = note.userInfo?["point"] as? CGPoint {
                 // SCNView's coordinate system origin is top-left for UIKit, but projectPoint returns in view space; convert if needed
@@ -473,6 +483,7 @@ class StarfieldViewModel: ObservableObject {
         var cameraAllowsControl: Bool = true
         var starSizeScale: CGFloat = 1.0
         var infoPanelOpacity: CGFloat = 0.85
+        var zoomLevel: CGFloat = 500.0  // Camera Z position (100-1000)
     }
 
     @Published var settings = Settings()
@@ -504,6 +515,14 @@ class StarfieldViewModel: ObservableObject {
     func applySettings() {
         sceneManager.apply(settings: settings)
     }
+    
+    func resetView() {
+        // Reset zoom level to default
+        settings.zoomLevel = 500.0
+        
+        // Reset camera position to initial view
+        sceneManager.cameraNode.position = SCNVector3(0, 0, 500)
+    }
 }
 
 // MARK: - SwiftUI SceneKit Representable
@@ -513,10 +532,12 @@ struct SceneKitViewRepresentable: UIViewRepresentable {
     let sceneManager: StarfieldSceneManager
     @Binding var selectedStar: Star?
     @Binding var settings: StarfieldViewModel.Settings
+    var onSettingsChange: ((StarfieldViewModel.Settings) -> Void)?
     
     func makeUIView(context: Context) -> SCNView {
         let sceneView = SCNView()
         sceneView.scene = sceneManager.scene
+        sceneView.pointOfView = sceneManager.cameraNode  // Explicitly set point of view
         sceneView.allowsCameraControl = settings.cameraAllowsControl
         #if canImport(UIKit)
         sceneView.backgroundColor = .black
@@ -530,10 +551,23 @@ struct SceneKitViewRepresentable: UIViewRepresentable {
         let tapGesture = UITapGestureRecognizer(target: context.coordinator,
                                                  action: #selector(Coordinator.handleTap(_:)))
         sceneView.addGestureRecognizer(tapGesture)
+        
+        // Add pinch gesture for zooming
+        let pinchGesture = UIPinchGestureRecognizer(target: context.coordinator,
+                                                     action: #selector(Coordinator.handlePinch(_:)))
+        pinchGesture.delegate = context.coordinator
+        sceneView.addGestureRecognizer(pinchGesture)
+        
+        context.coordinator.pinchGesture = pinchGesture
         #elseif canImport(AppKit)
         let tapGesture = NSClickGestureRecognizer(target: context.coordinator,
                                                    action: #selector(Coordinator.handleTap(_:)))
         sceneView.addGestureRecognizer(tapGesture)
+        
+        // Add magnification gesture for zooming on macOS
+        let magnifyGesture = NSMagnificationGestureRecognizer(target: context.coordinator,
+                                                               action: #selector(Coordinator.handleMagnify(_:)))
+        sceneView.addGestureRecognizer(magnifyGesture)
         #endif
         
         context.coordinator.sceneView = sceneView
@@ -543,27 +577,77 @@ struct SceneKitViewRepresentable: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: SCNView, context: Context) {
-        // Only apply settings if they have changed
-        if context.coordinator.lastAppliedSettings != settings {
-            sceneManager.apply(settings: settings)
-            context.coordinator.lastAppliedSettings = settings
+        // Skip updates if gesture is actively updating
+        if context.coordinator.isGestureUpdating {
+            // Don't update lastAppliedSettings - we want to apply settings after gesture ends
+            return
         }
+        
+        // Check if settings have changed
+        guard context.coordinator.lastAppliedSettings != settings else {
+            return
+        }
+        
+        // Verify pointOfView is set correctly
+        if uiView.pointOfView != sceneManager.cameraNode {
+            uiView.pointOfView = sceneManager.cameraNode
+        }
+        
+        // Check if zoom level changed
+        let zoomChanged = context.coordinator.lastAppliedSettings?.zoomLevel != settings.zoomLevel
+        
+        if zoomChanged {
+            // Get current camera position
+            let currentPos = sceneManager.cameraNode.position
+            let currentDistance = sqrt(currentPos.x * currentPos.x + 
+                                      currentPos.y * currentPos.y + 
+                                      currentPos.z * currentPos.z)
+            
+            // If camera is at origin, move it along Z axis
+            if currentDistance < 0.1 {
+                sceneManager.cameraNode.position = SCNVector3(0, 0, Float(settings.zoomLevel))
+            } else {
+                // Calculate scale factor to achieve target distance
+                let scaleFactor = Float(settings.zoomLevel) / currentDistance
+                
+                // Scale the position vector to maintain direction but change distance
+                sceneManager.cameraNode.position = SCNVector3(
+                    currentPos.x * scaleFactor,
+                    currentPos.y * scaleFactor,
+                    currentPos.z * scaleFactor
+                )
+            }
+        }
+        
+        // Apply all other settings (don't update camera position again)
+        sceneManager.apply(settings: settings, updateCameraPosition: false)
+        context.coordinator.lastAppliedSettings = settings
     }
     
     func makeCoordinator() -> Coordinator {
-        Coordinator(sceneManager: sceneManager, selectedStar: $selectedStar)
+        Coordinator(sceneManager: sceneManager, selectedStar: $selectedStar, settings: $settings)
     }
     
-    class Coordinator: NSObject {
+    class Coordinator: NSObject, UIGestureRecognizerDelegate {
         let sceneManager: StarfieldSceneManager
         @Binding var selectedStar: Star?
+        @Binding var settings: StarfieldViewModel.Settings
         weak var sceneView: SCNView?
+        weak var pinchGesture: UIPinchGestureRecognizer?
         var lastAppliedSettings: StarfieldViewModel.Settings?
         private var settingsObserver: NSObjectProtocol?
+        private var lastPinchScale: CGFloat = 1.0
+        var isGestureUpdating: Bool = false  // Flag to prevent double updates
         
-        init(sceneManager: StarfieldSceneManager, selectedStar: Binding<Star?>) {
+        init(sceneManager: StarfieldSceneManager, selectedStar: Binding<Star?>, settings: Binding<StarfieldViewModel.Settings>) {
             self.sceneManager = sceneManager
             self._selectedStar = selectedStar
+            self._settings = settings
+        }
+        
+        // Allow simultaneous gestures so pinch works alongside SceneKit's camera controls
+        func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+            return true
         }
         
         deinit {
@@ -642,6 +726,82 @@ struct SceneKitViewRepresentable: UIViewRepresentable {
             let scaleAction = SCNAction.scale(to: 1.5, duration: 0.2)
             node.runAction(scaleAction)
         }
+        
+        #if canImport(UIKit)
+        @objc func handlePinch(_ gesture: UIPinchGestureRecognizer) {
+            guard let camera = sceneManager.cameraNode else { 
+                print("❌ No camera node")
+                return 
+            }
+            
+            switch gesture.state {
+            case .began:
+                lastPinchScale = gesture.scale
+                isGestureUpdating = true
+            case .changed:
+                let currentScale = gesture.scale
+                let scaleDelta = currentScale / lastPinchScale
+                
+                // Get current distance from origin
+                let pos = camera.position
+                let currentDistance = sqrt(pos.x * pos.x + pos.y * pos.y + pos.z * pos.z)
+                
+                // Calculate new distance based on scale delta
+                // Scale > 1 means fingers spreading = zoom in = decrease distance
+                // Scale < 1 means fingers pinching = zoom out = increase distance
+                let zoomFactor: Float = 200.0  // Increased for more responsive zoom
+                let zoomAmount = (1.0 - Float(scaleDelta)) * zoomFactor
+                let newDistance = currentDistance + zoomAmount
+                
+                // Clamp distance between 100 and 1000
+                let clampedDistance = max(100, min(1000, newDistance))
+                
+                // Scale the position vector to achieve new distance while maintaining direction
+                let scaleFactor = clampedDistance / currentDistance
+                camera.position = SCNVector3(
+                    pos.x * scaleFactor,
+                    pos.y * scaleFactor,
+                    pos.z * scaleFactor
+                )
+                
+                // Update settings to reflect the change
+                settings.zoomLevel = CGFloat(clampedDistance)
+                lastPinchScale = currentScale
+            case .ended, .cancelled:
+                lastPinchScale = 1.0
+                isGestureUpdating = false
+            default:
+                break
+            }
+        }
+        #endif
+        
+        #if canImport(AppKit)
+        @objc func handleMagnify(_ gesture: NSMagnificationGestureRecognizer) {
+            guard let camera = sceneManager.cameraNode else { return }
+            
+            switch gesture.state {
+            case .changed:
+                let zoomSpeed: Float = 200.0
+                
+                // Positive magnification = zoom in (decrease Z)
+                // Negative magnification = zoom out (increase Z)
+                let zoomAmount = -Float(gesture.magnification) * zoomSpeed
+                let newZ = camera.position.z + zoomAmount
+                
+                // Clamp zoom between 100 and 1000
+                camera.position.z = max(100, min(1000, newZ))
+                
+                // Update settings to reflect the change
+                settings.zoomLevel = CGFloat(camera.position.z)
+                
+                // Reset gesture magnification to prevent compounding
+                gesture.magnification = 0
+            default:
+                break
+            }
+        }
+        #endif
     }
 }
 
@@ -702,6 +862,7 @@ struct InfoRow: View {
 struct SettingsPanel: View {
     @Binding var isPresented: Bool
     @Binding var settings: StarfieldViewModel.Settings
+    var onReset: (() -> Void)? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -739,8 +900,28 @@ struct SettingsPanel: View {
             }
             
             VStack(alignment: .leading) {
+                Text("Zoom Level: \(Int(settings.zoomLevel))").foregroundColor(.white)
+                Slider(value: $settings.zoomLevel, in: 100...1000)
+            }
+            
+            VStack(alignment: .leading) {
                 Text("Info Panel Opacity").foregroundColor(.white)
                 Slider(value: $settings.infoPanelOpacity, in: 0.3...1.0)
+            }
+            
+            // Reset button
+            Button(action: {
+                onReset?()
+            }) {
+                HStack {
+                    Image(systemName: "arrow.counterclockwise")
+                    Text("Reset View")
+                }
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 10)
+                .background(Color.blue.opacity(0.6))
+                .cornerRadius(8)
             }
         }
         .padding()

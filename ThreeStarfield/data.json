@@ -249,6 +249,356 @@
       "rightAscension": 51.080,
       "declination": 49.861,
       "color": "#f8f7ff"
+    },
+    {
+      "name": "Hadar",
+      "type": "B1III",
+      "magnitude": 0.61,
+      "distance": 390,
+      "temperature": 25000,
+      "rightAscension": 210.956,
+      "declination": -60.373,
+      "color": "#aabfff"
+    },
+    {
+      "name": "Acrux",
+      "type": "B0.5IV",
+      "magnitude": 0.77,
+      "distance": 320,
+      "temperature": 28000,
+      "rightAscension": 186.649,
+      "declination": -63.099,
+      "color": "#aabfff"
+    },
+    {
+      "name": "Mimosa",
+      "type": "B0.5III",
+      "magnitude": 1.25,
+      "distance": 280,
+      "temperature": 27000,
+      "rightAscension": 191.930,
+      "declination": -59.688,
+      "color": "#aabfff"
+    },
+    {
+      "name": "Gacrux",
+      "type": "M3.5III",
+      "magnitude": 1.63,
+      "distance": 88,
+      "temperature": 3600,
+      "rightAscension": 187.791,
+      "declination": -57.113,
+      "color": "#ff6347"
+    },
+    {
+      "name": "Shaula",
+      "type": "B1.5IV",
+      "magnitude": 1.63,
+      "distance": 700,
+      "temperature": 25000,
+      "rightAscension": 263.402,
+      "declination": -37.103,
+      "color": "#aabfff"
+    },
+    {
+      "name": "Elnath",
+      "type": "B7III",
+      "magnitude": 1.65,
+      "distance": 134,
+      "temperature": 13824,
+      "rightAscension": 81.573,
+      "declination": 28.608,
+      "color": "#bbccff"
+    },
+    {
+      "name": "Miaplacidus",
+      "type": "A1III",
+      "magnitude": 1.68,
+      "distance": 111,
+      "temperature": 8866,
+      "rightAscension": 138.300,
+      "declination": -69.717,
+      "color": "#9db4ff"
+    },
+    {
+      "name": "Alnair",
+      "type": "B7IV",
+      "magnitude": 1.74,
+      "distance": 101,
+      "temperature": 13920,
+      "rightAscension": 332.058,
+      "declination": -46.961,
+      "color": "#bbccff"
+    },
+    {
+      "name": "Alnitak",
+      "type": "O9.7Ib",
+      "magnitude": 1.74,
+      "distance": 1260,
+      "temperature": 29500,
+      "rightAscension": 85.190,
+      "declination": -1.943,
+      "color": "#9db4ff"
+    },
+    {
+      "name": "Alioth",
+      "type": "A0pCr",
+      "magnitude": 1.77,
+      "distance": 81,
+      "temperature": 9020,
+      "rightAscension": 193.507,
+      "declination": 55.960,
+      "color": "#9db4ff"
+    },
+    {
+      "name": "Kaus Australis",
+      "type": "B9.5III",
+      "magnitude": 1.85,
+      "distance": 143,
+      "temperature": 9960,
+      "rightAscension": 276.043,
+      "declination": -34.384,
+      "color": "#9db4ff"
+    },
+    {
+      "name": "Wezen",
+      "type": "F8Ia",
+      "magnitude": 1.84,
+      "distance": 1600,
+      "temperature": 6150,
+      "rightAscension": 107.098,
+      "declination": -26.393,
+      "color": "#fff4e8"
+    },
+    {
+      "name": "Avior",
+      "type": "K3III",
+      "magnitude": 1.86,
+      "distance": 632,
+      "temperature": 4000,
+      "rightAscension": 125.628,
+      "declination": -59.510,
+      "color": "#ffb347"
+    },
+    {
+      "name": "Alkaid",
+      "type": "B3V",
+      "magnitude": 1.86,
+      "distance": 101,
+      "temperature": 15400,
+      "rightAscension": 206.885,
+      "declination": 49.313,
+      "color": "#aabfff"
+    },
+    {
+      "name": "Sargas",
+      "type": "F0II",
+      "magnitude": 1.87,
+      "distance": 272,
+      "temperature": 6294,
+      "rightAscension": 264.330,
+      "declination": -42.998,
+      "color": "#fff4e8"
+    },
+    {
+      "name": "Atria",
+      "type": "K2IIb",
+      "magnitude": 1.91,
+      "distance": 391,
+      "temperature": 4150,
+      "rightAscension": 252.166,
+      "declination": -69.028,
+      "color": "#ffb347"
+    },
+    {
+      "name": "Alhena",
+      "type": "A0IV",
+      "magnitude": 1.93,
+      "distance": 109,
+      "temperature": 9260,
+      "rightAscension": 99.428,
+      "declination": 16.400,
+      "color": "#9db4ff"
+    },
+    {
+      "name": "Peacock",
+      "type": "B2IV",
+      "magnitude": 1.94,
+      "distance": 179,
+      "temperature": 17711,
+      "rightAscension": 306.412,
+      "declination": -56.735,
+      "color": "#aabfff"
+    },
+    {
+      "name": "Murzim",
+      "type": "B1II-III",
+      "magnitude": 1.98,
+      "distance": 490,
+      "temperature": 22000,
+      "rightAscension": 95.675,
+      "declination": -17.956,
+      "color": "#aabfff"
+    },
+    {
+      "name": "Alphard",
+      "type": "K3II-III",
+      "magnitude": 1.98,
+      "distance": 177,
+      "temperature": 4120,
+      "rightAscension": 141.897,
+      "declination": -8.659,
+      "color": "#ffb347"
+    },
+    {
+      "name": "Hamal",
+      "type": "K2III",
+      "magnitude": 2.00,
+      "distance": 66,
+      "temperature": 4480,
+      "rightAscension": 31.793,
+      "declination": 23.463,
+      "color": "#ffb347"
+    },
+    {
+      "name": "Diphda",
+      "type": "K0III",
+      "magnitude": 2.02,
+      "distance": 96,
+      "temperature": 4797,
+      "rightAscension": 10.897,
+      "declination": -17.987,
+      "color": "#ffb347"
+    },
+    {
+      "name": "Rasalhague",
+      "type": "A5III",
+      "magnitude": 2.08,
+      "distance": 47,
+      "temperature": 7880,
+      "rightAscension": 263.734,
+      "declination": 12.560,
+      "color": "#cad8ff"
+    },
+    {
+      "name": "Nunki",
+      "type": "B2.5V",
+      "magnitude": 2.05,
+      "distance": 228,
+      "temperature": 20900,
+      "rightAscension": 283.816,
+      "declination": -26.297,
+      "color": "#aabfff"
+    },
+    {
+      "name": "Menkent",
+      "type": "K0IIIb",
+      "magnitude": 2.06,
+      "distance": 61,
+      "temperature": 4980,
+      "rightAscension": 211.671,
+      "declination": -36.370,
+      "color": "#ffb347"
+    },
+    {
+      "name": "Alpheratz",
+      "type": "B9p",
+      "magnitude": 2.06,
+      "distance": 97,
+      "temperature": 13800,
+      "rightAscension": 2.097,
+      "declination": 29.091,
+      "color": "#bbccff"
+    },
+    {
+      "name": "Saiph",
+      "type": "B0.5Ia",
+      "magnitude": 2.07,
+      "distance": 722,
+      "temperature": 26500,
+      "rightAscension": 86.939,
+      "declination": -9.670,
+      "color": "#aabfff"
+    },
+    {
+      "name": "Tiaki",
+      "type": "M5III",
+      "magnitude": 2.07,
+      "distance": 170,
+      "temperature": 3350,
+      "rightAscension": 340.652,
+      "declination": -46.885,
+      "color": "#ff4500"
+    },
+    {
+      "name": "Kochab",
+      "type": "K4III",
+      "magnitude": 2.08,
+      "distance": 131,
+      "temperature": 4030,
+      "rightAscension": 222.676,
+      "declination": 74.156,
+      "color": "#ffb347"
+    },
+    {
+      "name": "Almach",
+      "type": "K3IIb",
+      "magnitude": 2.10,
+      "distance": 355,
+      "temperature": 4250,
+      "rightAscension": 30.975,
+      "declination": 42.330,
+      "color": "#ffb347"
+    },
+    {
+      "name": "Schedar",
+      "type": "K0IIa",
+      "magnitude": 2.24,
+      "distance": 228,
+      "temperature": 4552,
+      "rightAscension": 10.127,
+      "declination": 56.537,
+      "color": "#ffb347"
+    },
+    {
+      "name": "Mintaka",
+      "type": "O9.5II",
+      "magnitude": 2.23,
+      "distance": 900,
+      "temperature": 31500,
+      "rightAscension": 83.002,
+      "declination": -0.299,
+      "color": "#9db4ff"
+    },
+    {
+      "name": "Mizar",
+      "type": "A2V",
+      "magnitude": 2.27,
+      "distance": 86,
+      "temperature": 9000,
+      "rightAscension": 200.981,
+      "declination": 54.926,
+      "color": "#9db4ff"
+    },
+    {
+      "name": "Alphecca",
+      "type": "A0V",
+      "magnitude": 2.23,
+      "distance": 75,
+      "temperature": 9700,
+      "rightAscension": 233.672,
+      "declination": 26.715,
+      "color": "#9db4ff"
+    },
+    {
+      "name": "Naos",
+      "type": "O5Ia",
+      "magnitude": 2.25,
+      "distance": 1090,
+      "temperature": 42000,
+      "rightAscension": 120.896,
+      "declination": -40.003,
+      "color": "#9db4ff"
     }
   ]
 }

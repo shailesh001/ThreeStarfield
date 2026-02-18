@@ -45,5 +45,5 @@ The app follows **MVVM** with factory and coordinator patterns. Almost all logic
 - **Cross-platform guards**: Uses `#if canImport(UIKit)` / `#if canImport(AppKit)` for platform colors
 - **Settings update guard**: `lastAppliedSettings` comparison prevents redundant scene re-renders
 - **Observer cleanup**: NotificationCenter observers are removed in `deinit` to prevent memory leaks
-- **Zoom**: Camera position along its forward vector, clamped to 100–1000 range, zoom factor 200.0
+- **Zoom**: Camera moves radially from the origin by scaling its position vector, clamped to 100–1000 range, zoom factor 200.0
 - **Communication**: NotificationCenter used for camera control toggle between SwiftUI and SceneKit

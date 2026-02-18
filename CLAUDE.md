@@ -38,7 +38,7 @@ The app follows **MVVM** with factory and coordinator patterns. Almost all logic
 **Other files:**
 - `ThreeStarfieldApp.swift` — App entry point, single WindowGroup with `StarfieldView`
 - `ContentView.swift` — Legacy placeholder, unused
-- `data.json` — Star catalog with 25 stars (name, type, magnitude, distance, temperature, RA, Dec, hex color)
+- `data.json` — Star catalog with 60 stars (name, type, magnitude, distance, temperature, RA, Dec, hex color)
 
 ## Key Implementation Details
 
